@@ -113,7 +113,10 @@ public:
 template <class T>
 const T & priority_queue <T> :: top() const
 {
-   return *(new T);
+    if (empty())
+        return false;
+        //throw "std:out_of_range";
+    return container.front();
 }
 
 /**********************************************
@@ -123,6 +126,10 @@ const T & priority_queue <T> :: top() const
 template <class T>
 void priority_queue <T> :: pop()
 {
+    if (!empty())
+        std::swap(container.front(), container.back());
+    container.pop_back();
+    percolateDown(1);
 }
 
 /*****************************************
@@ -132,10 +139,21 @@ void priority_queue <T> :: pop()
 template <class T>
 void priority_queue <T> :: push(const T & t)
 {
+	container.push_back(t);
+	size_t i = container.size();
+	while (i > 1 && container[i - 1] > container[i / 2 - 1])
+	{
+		std::swap(container[i - 1], container[i / 2 - 1]);
+		i /= 2;
+	}
 }
 template <class T>
 void priority_queue <T> :: push(T && t)
 {
+    container.push_back(std::move(t));
+    size_t index = container.size() / 2;
+    while (index && percolateDown(index))
+        index /= 2;
 }
 
 /************************************************
@@ -147,7 +165,28 @@ void priority_queue <T> :: push(T && t)
 template <class T>
 bool priority_queue <T> :: percolateDown(size_t indexHeap)
 {
-   return false;
+    size_t indexLeft = indexHeap * 2;
+    size_t indexRight = indexLeft + 1;
+    size_t indexBigger;
+
+    if (indexLeft > size())
+        return false;
+
+    if (indexRight <= size())
+        indexBigger = container[indexLeft - 1] < container[indexRight - 1] ?
+        indexRight : indexLeft;
+
+    else
+        indexBigger = indexLeft;
+
+    if (container[indexHeap - 1] < container[indexBigger - 1])
+    {
+        std::swap(container[indexHeap - 1], container[indexBigger - 1]);
+        percolateDown(indexBigger);
+        return true;
+    }
+
+    return false;
 }
 
 /************************************************
@@ -157,7 +196,8 @@ bool priority_queue <T> :: percolateDown(size_t indexHeap)
 template <class T>
 void priority_queue <T> ::heapify()
 {
-
+	for (size_t i = size() / 2; i > 0; i--)
+		percolateDown(i);
 }
 
 /************************************************
@@ -168,6 +208,7 @@ template <class T>
 inline void swap(custom::priority_queue <T>& lhs,
                  custom::priority_queue <T>& rhs)
 {
+    std::swap(lhs.container, rhs.container);
 }
 
 };

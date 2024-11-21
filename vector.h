@@ -135,7 +135,14 @@ public:
    // size(), capacity(), and empty() are returning the member variables instead of the hardcoded values
    size_t  size()          const { return numElements;}
    size_t  capacity()      const { return numCapacity;}
-   bool empty()            const { return numElements == 0;}
+   bool empty()            const {
+       if (numElements == 0)
+       {
+           return true;
+       }
+       else
+           return false;
+   }
    
    // adjust the size of the buffer
    
