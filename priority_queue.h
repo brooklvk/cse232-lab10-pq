@@ -36,6 +36,13 @@ class priority_queue
    friend class ::TestPQueue; // give the unit test class access to the privates
    template <class TT>
    friend void swap(priority_queue<TT>& lhs, priority_queue<TT>& rhs);
+
+private:
+    void heapify();                            // convert the container in to a heap
+    bool percolateDown(size_t indexHeap);      // fix heap from index down. This is a heap index!
+
+	custom::vector<T> container;               //using our custom vector from previous assignment
+
 public:
 
    //
@@ -46,19 +53,27 @@ public:
    }
    priority_queue(const priority_queue &  rhs)  
    { 
+       this->container = rhs.container;
    }
    priority_queue(priority_queue && rhs)  
    { 
+       this->container = std::move(rhs.container);
    }
    template <class Iterator>
    priority_queue(Iterator first, Iterator last) 
    {
+       size_t newCapacity = last - first;
+       container.reserve(newCapacity);
+       for (auto it = first; it != last; it++)
+           container.push_back(*it);
    }
    explicit priority_queue (custom::vector<T> && rhs) 
    {
+       this->container = rhs;
    }
    explicit priority_queue (custom::vector<T>& rhs)
    {
+       this->container = std::move(rhs);
    }
   ~priority_queue() {}
 
@@ -83,20 +98,12 @@ public:
    //
    size_t size()  const 
    { 
-      return 99;   
+       return container.size();
    }
    bool empty() const 
    { 
-      return false;  
+       return container.empty();
    }
-   
-private:
-
-   void heapify();                            // convert the container in to a heap
-   bool percolateDown(size_t indexHeap);      // fix heap from index down. This is a heap index!
-
-   custom::vector<T> container; 
-
 };
 
 /************************************************
@@ -150,6 +157,7 @@ bool priority_queue <T> :: percolateDown(size_t indexHeap)
 template <class T>
 void priority_queue <T> ::heapify()
 {
+
 }
 
 /************************************************
