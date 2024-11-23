@@ -728,7 +728,8 @@ public:
       }
       catch (const std::out_of_range& error)
       {
-         assertUnit(error.what() == std::string("std:out_of_range"));
+          std::cerr << "Caught exception: " << error.what() << std::endl;
+          assertUnit(error.what() == std::string("std:out_of_range"));
       }
       assertUnit(value == int(99));
       assertEmptyFixture(pq);

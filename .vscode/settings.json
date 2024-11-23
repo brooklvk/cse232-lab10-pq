@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "memory": "cpp",
+        "xmemory": "cpp",
+        "format": "cpp",
+        "vector": "cpp",
+        "xlocale": "cpp",
+        "xutility": "cpp"
+    }
+}

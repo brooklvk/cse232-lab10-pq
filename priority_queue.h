@@ -48,17 +48,25 @@ public:
    //
    // construct
    //
+
+   // default constructor
    priority_queue() 
    {
    }
+
+    // copy constructor
    priority_queue(const priority_queue &  rhs)  
    { 
        this->container = rhs.container;
    }
+
+    // move constructor
    priority_queue(priority_queue && rhs)  
    { 
        this->container = std::move(rhs.container);
    }
+
+    // initializer list constructor using iterators
    template <class Iterator>
    priority_queue(Iterator first, Iterator last) 
    {
@@ -67,44 +75,55 @@ public:
        for (auto it = first; it != last; it++)
            container.push_back(*it);
    }
-   explicit priority_queue (custom::vector<T> && rhs) 
+
+    // initializer list constructor using our custom vector
+   priority_queue (custom::vector<T> && rhs) 
    {
-       this->container = rhs;
+        // Move the vector into the container
+        container = std::move(rhs);
+        // Build the heap from the moved data
+        heapify();
    }
-   explicit priority_queue (custom::vector<T>& rhs)
+
+    // initializer list constructor using our custom vector
+   priority_queue (custom::vector<T>& rhs) // 
    {
        this->container = std::move(rhs);
    }
+
+    // destructor thats here but does nothing...
   ~priority_queue() {}
 
    //
    // Access
    //
-   const T & top() const;
+   const T & top() const; // Get the maximum item the top item.
 
    //
    // Insert
    //
-   void  push(const T& t);
-   void  push(T&& t);     
+   void  push(const T& t); // Add a new element to the heap
+   void  push(T&& t);      // also add a new element to the heap
 
    //
    // Remove
    //
-   void  pop(); 
+   void  pop(); // Remove the top item from the heap
 
    //
    // Status
    //
    size_t size()  const 
    { 
-       return container.size();
+       return container.size(); // get the size from the container using our vector
    }
    bool empty() const 
    { 
-       return container.empty();
+       return container.empty(); //uses vectors empty
    }
 };
+
+
 
 /************************************************
  * P QUEUE :: TOP
@@ -113,10 +132,14 @@ public:
 template <class T>
 const T & priority_queue <T> :: top() const
 {
-    if (empty())
-        return false;
-        //throw "std:out_of_range";
-    return container.front();
+    if (empty()) // Check if the queue is empty
+    {
+        std::cerr << "Throwing std::out_of_range in top()" << std::endl; // Send this specific error message for the unit test
+        throw std::out_of_range("std:out_of_range"); // Throw an out of range for test
+
+    }
+
+    return container.front(); // Return the front (or top) element of the container
 }
 
 /**********************************************
@@ -126,33 +149,37 @@ const T & priority_queue <T> :: top() const
 template <class T>
 void priority_queue <T> :: pop()
 {
-    if (!empty())
-        std::swap(container.front(), container.back());
-    container.pop_back();
-    percolateDown(1);
+    if (!empty()) // Check if the queue is empty
+        std::swap(container.front(), container.back()); // if not empty then we need to swap the front and back elements to remove the top element
+    container.pop_back(); // now we can pop/remove the back element
+    percolateDown(1); // percolate down to fix the heap
 }
 
 /*****************************************
  * P QUEUE :: PUSH
  * Add a new element to the heap, reallocating as necessary
  ****************************************/
+
+// push takes a const reference and adds it to the container, then percolates it to the correct positions and fixes the heap
 template <class T>
 void priority_queue <T> :: push(const T & t)
 {
 	container.push_back(t);
-	size_t i = container.size();
+	size_t i = container.size(); 
 	while (i > 1 && container[i - 1] > container[i / 2 - 1])
 	{
 		std::swap(container[i - 1], container[i / 2 - 1]);
 		i /= 2;
 	}
 }
+
+// same as above but with rvalue reference
 template <class T>
 void priority_queue <T> :: push(T && t)
 {
     container.push_back(std::move(t));
     size_t index = container.size() / 2;
-    while (index && percolateDown(index))
+    while (index && percolateDown(index)) 
         index /= 2;
 }
 
@@ -162,6 +189,9 @@ void priority_queue <T> :: push(T && t)
  * order. Take care of that little detail!
  * Return TRUE if anything changed.
  ************************************************/
+
+// percolates percolates down the heap (the heap is a binary tree where the parent is always greater than the children) 
+// we need to make sure the heap is in order so we percolate down the heap to fix it when needed
 template <class T>
 bool priority_queue <T> :: percolateDown(size_t indexHeap)
 {
@@ -193,10 +223,13 @@ bool priority_queue <T> :: percolateDown(size_t indexHeap)
  * P QUEUE :: HEAPIFY
  * Turn the container into a heap.
  ************************************************/
+
+// heapify converts the container (the container is a vector) into a heap (a heap is like a BST but the parent is always greater than the children)
+// it does this by percolating down the heap and while it is moving through the heap adjusting the elements so that lower elements are moved down and higher elements are moved up
 template <class T>
 void priority_queue <T> ::heapify()
 {
-	for (size_t i = size() / 2; i > 0; i--)
+	for (size_t i = size() / 2; i > 0; i--)  
 		percolateDown(i);
 }
 
@@ -204,6 +237,8 @@ void priority_queue <T> ::heapify()
  * SWAP
  * Swap the contents of two priority queues
  ************************************************/
+
+// swap swaps...
 template <class T>
 inline void swap(custom::priority_queue <T>& lhs,
                  custom::priority_queue <T>& rhs)
