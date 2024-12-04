@@ -71,7 +71,9 @@ public:
    priority_queue(Iterator first, Iterator last) 
    {
        size_t newCapacity = last - first;
-       container.reserve(newCapacity);
+       container.reserve(newCapacity); // allocate as much as needed 
+
+       // Add each new item 
        for (auto it = first; it != last; it++)
            container.push_back(*it);
    }
@@ -91,7 +93,8 @@ public:
        this->container = std::move(rhs);
    }
 
-    // destructor thats here but does nothing...
+    // destructor thats here but does nothing. 
+    // Not needed because the underlying vector structure takes care of it 
   ~priority_queue() {}
 
    //
@@ -134,9 +137,9 @@ const T & priority_queue <T> :: top() const
 {
     if (empty()) // Check if the queue is empty
     {
+        // If we don't throw an error here, something invalid would be returned 
         std::cerr << "Throwing std::out_of_range in top()" << std::endl; // Send this specific error message for the unit test
         throw std::out_of_range("std:out_of_range"); // Throw an out of range for test
-
     }
 
     return container.front(); // Return the front (or top) element of the container
@@ -164,7 +167,10 @@ void priority_queue <T> :: pop()
 template <class T>
 void priority_queue <T> :: push(const T & t)
 {
-	container.push_back(t);
+	container.push_back(t); // add item 
+
+    // fix the heap 
+    // similar to percolateDown() 
 	size_t i = container.size(); 
 	while (i > 1 && container[i - 1] > container[i / 2 - 1])
 	{
@@ -177,9 +183,11 @@ void priority_queue <T> :: push(const T & t)
 template <class T>
 void priority_queue <T> :: push(T && t)
 {
-    container.push_back(std::move(t));
+    container.push_back(std::move(t)); // add item 
+
+    // fix the heap 
     size_t index = container.size() / 2;
-    while (index && percolateDown(index)) 
+    while (index && percolateDown(index)) // here we can just call percolateDown() 
         index /= 2;
 }
 
@@ -190,33 +198,39 @@ void priority_queue <T> :: push(T && t)
  * Return TRUE if anything changed.
  ************************************************/
 
-// percolates percolates down the heap (the heap is a binary tree where the parent is always greater than the children) 
+// percolates down the heap (the heap is a binary tree where the parent is always greater than the children) 
 // we need to make sure the heap is in order so we percolate down the heap to fix it when needed
 template <class T>
 bool priority_queue <T> :: percolateDown(size_t indexHeap)
 {
-    size_t indexLeft = indexHeap * 2;
+    size_t indexLeft = indexHeap * 2; // indexHeap is the current element 
     size_t indexRight = indexLeft + 1;
-    size_t indexBigger;
+    size_t indexBigger; // we will find the largest element 
 
     if (indexLeft > size())
-        return false;
+        return false; // no change is needed 
+
+    // Find the largest element, should be on top of the heap 
 
     if (indexRight <= size())
+
+        // if left element is smaller, set right element to indexBigger. else left is indexBigger 
         indexBigger = container[indexLeft - 1] < container[indexRight - 1] ?
         indexRight : indexLeft;
 
-    else
+    else // if right > size() 
         indexBigger = indexLeft;
 
-    if (container[indexHeap - 1] < container[indexBigger - 1])
+    if (container[indexHeap - 1] < container[indexBigger - 1]) // compare the current index with whichever we found was larger, above 
     {
-        std::swap(container[indexHeap - 1], container[indexBigger - 1]);
-        percolateDown(indexBigger);
-        return true;
+        std::swap(container[indexHeap - 1], container[indexBigger - 1]); // swap if: current element is less than the larger element we found above. 
+        // Because the largest value has to be on top of the heap 
+
+        percolateDown(indexBigger); // recursively call method to fix subtrees 
+        return true; // we did make a change by swapping 
     }
 
-    return false;
+    return false; // no change was needed 
 }
 
 /************************************************
@@ -230,7 +244,7 @@ template <class T>
 void priority_queue <T> ::heapify()
 {
 	for (size_t i = size() / 2; i > 0; i--)  
-		percolateDown(i);
+		percolateDown(i); // apply to all elements in the heap 
 }
 
 /************************************************
@@ -243,7 +257,7 @@ template <class T>
 inline void swap(custom::priority_queue <T>& lhs,
                  custom::priority_queue <T>& rhs)
 {
-    std::swap(lhs.container, rhs.container);
+    std::swap(lhs.container, rhs.container); // swappy swap swap 
 }
 
 };
